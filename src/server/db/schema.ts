@@ -45,10 +45,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
 export const sessions = createTable(
   "session",
   {
-    id: text("id")
-      .primaryKey()
-      .notNull()
-      .$defaultFn(() => nanoid()),
+    id: text("id").primaryKey(),
     userId: text("user_id")
       .notNull()
       .references(() => users.id),
