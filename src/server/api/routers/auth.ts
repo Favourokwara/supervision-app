@@ -1,8 +1,9 @@
 import { createTRPCRouter, publicProcedure } from "../trpc";
-import { SignUpSchema } from "../../../common/validations/auth";
+import { LoginSchema, SignUpSchema } from "../../../common/validations/auth";
 import { eq } from "drizzle-orm";
 import { keys, users } from "../../db/schema";
 import { TRPCError } from "@trpc/server";
+import { Argon2id } from "oslo/password";
 
 export const authRouter = createTRPCRouter({
   signUp: publicProcedure
@@ -67,4 +68,35 @@ export const authRouter = createTRPCRouter({
         result: result,
       };
     }),
+  login: publicProcedure.input(LoginSchema).mutation(async ({ ctx, input }) => {
+    const { username, password } = input;
+
+    const exists = await ctx.db.query.users.findFirst({
+      where: eq(users.username, username),
+      with: { key: true },
+    });
+
+    if (!exists)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Incorrect username or password",
+      });
+
+    const validPassword = await new Argon2id().verify(
+      exists.key?.hashedPassword ?? "",
+      password,
+    );
+
+    if (!validPassword)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Incorrect username or password",
+      });
+
+    return {
+      status: 200,
+      message: "Logged In Successfully.",
+      result: { id: exists.id, username: exists.username },
+    };
+  }),
 });

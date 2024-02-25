@@ -1,7 +1,11 @@
 "use client";
 
-import { signup } from "@/app/_components/_signup-actions";
-import { SignUpSchema, type ISignUp } from "@/common/validations/auth";
+import { login } from "@/app/_components/_signup-actions";
+import {
+  SignUpSchema,
+  type ISignUp,
+  type ILogin,
+} from "@/common/validations/auth";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -18,19 +22,18 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 
-export default function SignUpPage() {
+export default function LoginPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const form = useForm<ISignUp>({
+  const form = useForm<ILogin>({
     resolver: zodResolver(SignUpSchema),
     defaultValues: {
       username: "",
-      email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (values: ISignUp) => {
-    await signup(values);
+  const onSubmit = async (values: ILogin) => {
+    await login(values);
   };
 
   return (
@@ -50,29 +53,6 @@ export default function SignUpPage() {
                   autoComplete="username"
                   autoCorrect="off"
                   autoCapitalize="off"
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  id="email"
-                  placeholder="name@example.com"
-                  type="email"
-                  autoCapitalize="none"
-                  autoComplete="email"
-                  autoCorrect="off"
-                  disabled={isLoading}
                   {...field}
                 />
               </FormControl>

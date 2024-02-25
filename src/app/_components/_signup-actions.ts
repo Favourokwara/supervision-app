@@ -1,6 +1,6 @@
 "use server";
 
-import type { ISignUp } from "@/common/validations/auth";
+import type { ILogin, ISignUp } from "@/common/validations/auth";
 import { lucia } from "@/server/auth";
 import { api } from "@/trpc/server";
 import { redirect } from "next/navigation";
@@ -27,5 +27,28 @@ export async function signup(data: ISignUp) {
     return redirect("/");
   } else {
     throw new Error("Unable to complete sign up.");
+  }
+}
+
+export async function login(data: ILogin) {
+  const password = await new Argon2id().hash(data.password);
+
+  const { status, result } = await api.auth.login.mutate({
+    ...data,
+    password,
+  });
+
+  if (status === 200) {
+    const session = await lucia.createSession(result.id, {});
+    const sessionCookie = lucia.createSessionCookie(session.id);
+
+    cookies().set(
+      sessionCookie.name,
+      sessionCookie.value,
+      sessionCookie.attributes,
+    );
+    return redirect("/");
+  } else {
+    throw new Error("Unable to complete sign in.");
   }
 }
