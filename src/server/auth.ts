@@ -3,7 +3,7 @@ import { db } from "./db";
 import { sessions, users } from "./db/schema";
 import { Lucia } from "lucia";
 import { env } from "@/env";
-import { type ISignUp } from "@/common/validations/auth";
+import type { ISignUp } from "@/common/validations/auth";
 
 export const adapter = new DrizzlePostgreSQLAdapter(db, sessions, users);
 
