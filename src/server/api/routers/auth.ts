@@ -1,4 +1,3 @@
-import { Argon2id } from "oslo/password";
 import { createTRPCRouter, publicProcedure } from "../trpc";
 import { SignUpSchema } from "../../../common/validations/auth";
 import { eq } from "drizzle-orm";
@@ -43,8 +42,6 @@ export const authRouter = createTRPCRouter({
           message: "User already exists.",
         });
 
-      const hashedPassword = await new Argon2id().hash(password);
-
       const result = await ctx.db.transaction(async (tx) => {
         const created = await tx
           .insert(users)
@@ -52,10 +49,10 @@ export const authRouter = createTRPCRouter({
           .returning();
 
         if (created[0])
-          // atleast one user created
+          // checks if user was created...
           await tx
             .insert(keys)
-            .values({ userId: created[0].id, hashedPassword });
+            .values({ userId: created[0].id, hashedPassword: password });
         else
           throw new TRPCError({
             code: "INTERNAL_SERVER_ERROR",
