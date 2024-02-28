@@ -1,9 +1,11 @@
 // Example model schema from the Drizzle docs
 // https://orm.drizzle.team/docs/sql-schema-declaration
 
+import { create } from "domain";
 import { relations, sql } from "drizzle-orm";
 import {
   index,
+  pgEnum,
   pgTableCreator,
   serial,
   text,
@@ -21,6 +23,8 @@ import { nanoid } from "nanoid";
  */
 export const createTable = pgTableCreator((name) => `supervision-app_${name}`);
 
+export const rolesEnum = pgEnum("role", ["ADMIN", "SUPERVISOR", "STUDENT"]);
+
 export const users = createTable(
   "user",
   {
@@ -30,6 +34,11 @@ export const users = createTable(
       .$defaultFn(() => nanoid()),
     username: text("username").unique().notNull(),
     email: text("email").unique().notNull(),
+    role: rolesEnum("role").notNull().default("STUDENT"),
+    createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true }),
   },
   (table) => ({
     nameIndex: uniqueIndex("user_name_idx").on(table.username),
@@ -85,6 +94,18 @@ export const keys = createTable(
 export const keyRelations = relations(keys, ({ one }) => ({
   user: one(users, { fields: [keys.userId], references: [users.id] }),
 }));
+
+export const programs = createTable("program", {
+  id: text("id")
+    .primaryKey()
+    .notNull()
+    .$defaultFn(() => nanoid()),
+  name: text("name").unique().notNull(),
+  createdAt: timestamp("created_at", { mode: "date", withTimezone: true })
+    .default(sql`CURRENT_TIMESTAMP`)
+    .notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true }),
+});
 
 export const posts = createTable(
   "post",

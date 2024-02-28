@@ -1,6 +1,6 @@
 "use client";
 
-import { signup } from "@/app/_components/_signup-actions";
+import { signup } from "@/app/_components/_auth-actions";
 import { SignUpSchema, type ISignUp } from "@/common/validations/auth";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";

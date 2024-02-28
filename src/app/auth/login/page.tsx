@@ -1,11 +1,7 @@
 "use client";
 
-import { login } from "@/app/_components/_signup-actions";
-import {
-  SignUpSchema,
-  type ISignUp,
-  type ILogin,
-} from "@/common/validations/auth";
+import { login } from "@/app/_components/_auth-actions";
+import { type ILogin, LoginSchema } from "@/common/validations/auth";
 import { Icons } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,7 +21,7 @@ import { useForm } from "react-hook-form";
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const form = useForm<ILogin>({
-    resolver: zodResolver(SignUpSchema),
+    resolver: zodResolver(LoginSchema),
     defaultValues: {
       username: "",
       password: "",
@@ -82,7 +78,7 @@ export default function LoginPage() {
         />
         <Button disabled={isLoading}>
           {isLoading && <Icons.spinner className="mr-2 h-4 w-4 animate-spin" />}
-          Sign Up with Email
+          Sign In with Email
         </Button>
       </form>
       <div className="relative">
